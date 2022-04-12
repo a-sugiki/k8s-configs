@@ -32,5 +32,3 @@ roce_netif = ens160
 [kube_gpu:vars]
 roce_netif = ens192
 
-[all:vars]
-ansible_user = mdxuser

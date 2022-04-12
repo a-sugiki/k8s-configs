@@ -1,3 +1,5 @@
 ---
+ansible_user: mdxuser
+
 internal_domain: internal
 roce_suffix: roce
