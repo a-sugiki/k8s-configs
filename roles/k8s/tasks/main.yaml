@@ -1,0 +1,5 @@
+---
+- import_tasks: k0s.yaml
+- import_tasks: kubectl.yaml
+- import_tasks: helm.yaml
+- import_tasks: docker.yaml

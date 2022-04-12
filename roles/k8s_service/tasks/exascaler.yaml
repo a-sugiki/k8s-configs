@@ -1,0 +1,48 @@
+---
+#
+# DDN Exascaler CSI File Driver
+#
+- name: Create namespace
+  k8s:
+    kind: Namespace
+    name: '{{ exascaler_namespace }}'
+    state: present
+
+- name: Create k8s secret
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: exascaler-csi-file-driver-config
+        namespace: '{{ exascaler_namespace }}'
+      type: Opaque
+      data:
+        exascaler-csi-file-driver-config.yaml: '{{ lookup("file", "files/exascaler-csi-file-driver-config.yaml") | b64encode }}'
+
+- name: Download exascaler CSI driver
+  git:
+    repo: https://github.com/DDNStorage/exa-csi-driver.git
+    dest: /home/mdxuser/exa-csi-driver
+    force: yes
+
+- name: Rewrite exascaler CSI driver file 
+  replace:
+    path: exa-csi-driver/deploy/kubernetes/exascaler-csi-file-driver.yaml
+    regexp: '/var/lib/'
+    replace: '/var/lib/k0s/'
+    backup: yes
+
+- name: Rewrite exascaler CSI driver file (2)
+  replace:
+    path: exa-csi-driver/deploy/kubernetes/exascaler-csi-file-driver.yaml
+    regexp: 'namespace: default # replace with non-default namespace name if needed'
+    replace: 'namespace: {{ exascaler_namespace }}'
+    backup: yes
+
+- name: Deploy exascaler CSI driver
+  k8s:
+    state: present
+    namespace: '{{ exascaler_namespace }}'
+    src: /home/mdxuser/exa-csi-driver/deploy/kubernetes/exascaler-csi-file-driver.yaml

@@ -1,0 +1,5 @@
+---
+exascaler_namespace: exascaler
+#exascaler_namespace: default
+
+metallb_range: 10.18.20.200-10.18.20.200.210

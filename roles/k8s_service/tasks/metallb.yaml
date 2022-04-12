@@ -1,0 +1,23 @@
+---
+#
+# Metal LB
+#
+- name: Add MetalLB helm repository
+  kubernetes.core.helm_repository:
+    name: metallb
+    repo_url: "https://metallb.github.io/metallb"
+
+- name: Install MetalLB
+  kubernetes.core.helm:
+    name: metallb
+    chart_ref: metallb/metallb
+    release_namespace: metallb
+    create_namespace: true
+    values:
+      configInline:
+        address-pools:
+          - name: default
+            protocol: layer2
+            addresses:
+            - 10.18.20.200-10.18.20.210
+

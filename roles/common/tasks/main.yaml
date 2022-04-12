@@ -1,0 +1,17 @@
+---
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname_short }}"
+  become: yes
+
+- name: Generate /etc/hosts
+  template:
+    src: templates/etc_hosts.j2
+    dest: /etc/hosts
+    backup: yes
+  become: yes
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: yes

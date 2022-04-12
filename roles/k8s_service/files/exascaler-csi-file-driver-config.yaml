@@ -1,0 +1,3 @@
+exaFS: 172.17.8.40@o2ib10:172.17.8.41@o2ib10:/fast
+mountPoint: /fast
+debug: true

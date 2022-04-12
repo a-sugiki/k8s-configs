@@ -1,0 +1,27 @@
+---
+#
+# Install the certificates for private registry
+#
+- name: Install private certificate
+  copy:
+    src: /home/mdxuser/harbor.internal.crt
+    dest: /etc/ssl/certs/
+  become: yes
+
+- name: Create cert directory
+  file: 
+    path: /etc/containerd/certs.d/harbor.internal
+    state: directory
+  become: yes
+
+- name: Install hosts.toml
+  copy:
+    dest: /etc/containerd/certs.d/harbor.internal/hosts.toml
+    content: |
+      server = "https://harbor.internal"
+      
+      [host."https://harbor.internal"]
+        capabilities = ["pull", "resolve"]
+        ca = "/etc/ssl/certs/harbor.internal.crt"
+  become: yes
+

@@ -1,0 +1,24 @@
+---
+- name: Create docker cert directory 
+  file:
+    path: /etc/docker/certs.d/harbor.internal    
+    state: directory
+  become: yes
+
+- name: Install CA cert
+  copy:
+    src: /home/mdxuser/ca.crt
+    dest: /etc/docker/certs.d/harbor.internal/
+  become: yes
+
+- name: Install docker for creating images
+  apt:
+    name: docker.io
+  become: yes
+
+- name: Start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes

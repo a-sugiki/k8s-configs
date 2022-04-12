@@ -1,0 +1,10 @@
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1=harbor
+DNS.2=harbor.internal
+DNS.3={{ ansible_default_ipv4.address }}

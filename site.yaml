@@ -1,0 +1,58 @@
+---
+- name: Common configuration
+  hosts: all
+  roles: 
+    - common
+  tags:
+  - common
+  - all
+  - never
+
+- name: Install harbor container registry
+  hosts: registry
+  roles:
+    - registry
+  tags:
+  - registry
+  - all
+  - never
+
+- name: Install kubernets cluster
+  hosts: bastion_host
+  roles:
+    - k8s
+  tags:
+  - k8s_base
+  - k8s
+  - all
+  - never
+
+- name: Setup kubernets workers
+  hosts: kube_worker
+  roles:
+    - k8s_worker
+  tags:
+  - k8s_worker
+  - k8s
+  - all
+  - never
+
+- name: Setup kubernetes gpu workers
+  hosts: kube_gpu
+  roles:
+    - k8s_gpu
+  tags:
+  - k8s_gpu
+  - k8s
+  - all
+  - never
+
+- name: Deploy kubernetes services
+  hosts: bastion_host
+  roles:
+    - k8s_service
+  tags:
+  - service
+  - k8s
+  - all
+  - never

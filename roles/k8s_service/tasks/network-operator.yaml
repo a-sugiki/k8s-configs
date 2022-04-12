@@ -1,0 +1,44 @@
+---
+#
+# NVIDIA Network Operator
+#
+- name: Add Mellanox helm repository
+  kubernetes.core.helm_repository:
+    name: mellanox
+    repo_url: "https://mellanox.github.io/network-operator"
+
+- name: Install network operator
+  kubernetes.core.helm:
+    name: network-operator
+    chart_ref: mellanox/network-operator
+    release_namespace: network-operator
+    create_namespace: true
+    values:
+      nfd:
+        enabled: false
+        #enabled: true
+      sriovNetworkOperator:
+        enabled: false
+      deployCR: true
+      ofedDriver:
+        deploy: false
+        #deploy: true
+      nvPeerDriver:
+        deploy: false
+        #deploy: true
+      rdmaSharedDevicePlugin:
+        deploy: true
+        resources:
+        - name: rdma_shared_device
+          drivers: ["mlx5_core"]
+          #vendors: [15b3]
+      sriovDevicePlugin:
+        deploy: false
+      secondaryNetwork:
+        deploy: true
+        multus:
+          deploy: true
+        cniPlugins:
+          deploy: true
+        ipamPlugin:
+          deploy: true

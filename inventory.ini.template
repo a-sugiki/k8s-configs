@@ -1,0 +1,36 @@
+[bastion_host]
+bastion ansible_host=
+
+[registry]
+harbor ansible_host=
+
+[kube_master]
+kube-master ansible_host=
+
+[kube_node]
+kube-node1 ansible_host= roce_host=
+kube-node2 ansible_host= roce_host=
+
+[kube_gpu]
+kube-gpu1 ansible_host= roce_host=
+kube-gpu2 ansible_host= roce_host=
+
+[kube_worker:children]
+kube_node
+kube_gpu
+
+[kube_cluster:children]
+kube_master
+kube_worker
+
+[kube_master:vars]
+roce_netif = ens160
+
+[kube_node:vars]
+roce_netif = ens160
+
+[kube_gpu:vars]
+roce_netif = ens192
+
+[all:vars]
+ansible_user = mdxuser

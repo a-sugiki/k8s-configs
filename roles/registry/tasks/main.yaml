@@ -1,0 +1,156 @@
+---
+- name: Download harbor installer
+  get_url:
+    url: https://github.com/goharbor/harbor/releases/download/v2.4.2/harbor-online-installer-v2.4.2.tgz
+    dest: /home/mdxuser/
+
+- name: Uncompress harbor installler
+  unarchive:
+    src: /home/mdxuser/harbor-online-installer-v2.4.2.tgz
+    dest: /home/mdxuser/
+    remote_src: yes
+
+- name: Create a certificate directory
+  file: 
+    path: /home/mdxuser/harbor/cert
+    state: directory
+
+- name: generate a CA private key
+  command:
+    cmd: openssl genrsa -out ca.key 4096
+    chdir: /home/mdxuser/harbor/cert
+
+- name: generate a CA certificate
+  command: 
+    cmd: >
+      openssl req -x509 -new -nodes 
+        -sha512 -days 3650 
+        -subj "/C=JP/ST=Chiba/L=Kashiwa/O=MDX/OU=Private/CN=harbor.internal" 
+        -key ca.key -out ca.crt
+    chdir: /home/mdxuser/harbor/cert
+
+- name: generate a server sertificate
+  command:
+    cmd: openssl genrsa -out harbor.internal.key 4096
+    chdir: /home/mdxuser/harbor/cert
+
+- name: generate a CSR
+  command:
+    cmd: >
+      openssl req -sha512 -new 
+        -subj "/C=JP/ST=Chiba/L=Kashiwa/O=MDX/OU=Private/CN=harbor.internal" 
+        -key harbor.internal.key -out harbor.internal.csr
+    chdir: /home/mdxuser/harbor/cert
+
+- name: generate an x509v3 extension file
+  template:
+    src: templates/v3.ext.j2
+    dest: /home/mdxuser/harbor/cert/v3.ext
+
+- name: Replace the x509 certificate
+  command:
+    cmd: >
+      openssl x509 -req -sha512 -days 3650 
+        -extfile v3.ext 
+        -CA ca.crt -CAkey ca.key -CAcreateserial 
+        -in harbor.internal.csr 
+        -out harbor.internal.crt
+    chdir: /home/mdxuser/harbor/cert
+
+- name: Convert the certificate to PEM file
+  command:
+    cmd: >
+      openssl x509 -inform PEM 
+        -in harbor.internal.crt 
+        -out harbor.internal.cert
+    chdir: /home/mdxuser/harbor/cert
+
+- name: Fetch the PEM file
+  fetch:
+    src: harbor/cert/harbor.internal.crt
+    dest: /home/mdxuser/harbor.internal.crt
+    flat: yes
+
+- name: Fetch the CA certificate file
+  fetch:
+    src: harbor/cert/ca.crt
+    dest: /home/mdxuser/ca.crt
+    flat: yes
+
+- name: Copy harbor config file
+  copy:
+    src: harbor/harbor.yml.tmpl
+    dest: harbor/harbor.yml
+    remote_src: yes
+
+- name: Replace harbor config file
+  replace:
+    path: harbor/harbor.yml
+    regexp: 'hostname: reg.mydomain.com'
+    replace: 'hostname: harbor.internal'
+
+- name: Replace harbor config file (2)
+  replace:
+    path: harbor/harbor.yml
+    regexp: 'certificate: /your/certificate/path'
+    replace: 'certificate: /home/mdxuser/harbor/cert/harbor.internal.cert'
+
+- name: Replace harbor config file (3)
+  replace:
+    path: harbor/harbor.yml
+    regexp: 'private_key: /your/private/key/path'
+    replace: 'private_key: /home/mdxuser/harbor/cert/harbor.internal.key'
+
+#
+# TODO: generate a random password
+#
+#- name: Replace db password
+#  replace:
+#    path: harbor/harbor.yml
+#    regexp: 'harbor_admin_password: Harbor12345'
+#    replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
+
+#
+# TODO: generate a random password for DB
+#
+#- name: Replace db password
+#  replace:
+#    path: harbor/harbor.yml
+#    regexp: 'password: root123'
+#    replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
+
+- name: Replace data volume
+  replace:
+    path: harbor/harbor.yml
+    regexp: 'data_volume: /data'
+    replace: 'data_volume: /home/mdxuser/harbor/data'
+
+- name: Install docker
+  apt:
+    name: docker.io
+  become: yes
+
+- name: Install docker compose
+  apt:
+    name: docker-compose
+  become: yes
+
+- name: Start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: yes
+
+- name: Prepare harbor
+  command:
+    cmd: ./prepare
+    chdir: /home/mdxuser/harbor
+  become: yes
+
+- name: Install harbor
+  command:
+    cmd: ./install.sh
+    chdir: /home/mdxuser/harbor
+  become: yes
+

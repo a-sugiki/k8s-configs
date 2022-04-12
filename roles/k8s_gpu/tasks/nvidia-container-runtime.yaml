@@ -1,0 +1,72 @@
+---
+- name: Register nvidia-container-runtime repository
+  shell:
+    cmd: |
+      curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | sudo apt-key add -
+      distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+      curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | sudo tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+      sudo apt-get update
+    warn: false
+
+- name: Install nvidia-container-runtime
+  apt:
+    name: nvidia-container-runtime
+    state: present
+  become: yes
+
+- name: Generate default config file
+  shell:
+    cmd: containerd config default > /etc/k0s/containerd.toml
+  become: yes
+
+- name: Rewrite containerd.toml (1)
+  replace:
+    path: /etc/k0s/containerd.toml
+    regexp: 'root = "/var/lib/containerd"'
+    replace: 'root = "/var/lib/k0s/containerd"'
+  become: yes
+
+- name: Rewrite containerd.toml (2)
+  replace:
+    path: /etc/k0s/containerd.toml
+    regexp: 'state = "/run/containerd"'
+    replace: 'state = "/var/lib/k0s/run/containerd"'
+  become: yes
+
+- name: Rewrite containerd.toml (3)
+  replace:
+    path: /etc/k0s/containerd.toml
+    #regexp: 'address = "/run/containerd.sock"'
+    regexp: 'address = "/run/containerd/containerd.sock"'
+    replace: 'address = "/var/lib/k0s/run/containerd.sock"'
+  become: yes
+
+- name: Rewrite containerd.toml (4)
+  replace:
+    path: /etc/k0s/containerd.toml
+    after: '[plugins."io.containerd.grpc.v1.cri".containerd]'
+    regexp: 'default_runtime_name = "runc"'
+    replace: 'default_runtime_name = "nvidia"'
+  become: yes
+
+- name: Rewrite containerd.toml (5)
+  blockinfile:
+    path: /etc/k0s/containerd.toml
+    insertbefore: '\[plugins."io.containerd.grpc.v1.cri".containerd.untrusted_workload_runtime\]'
+    block: |
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+            runtime_type = "io.containerd.runc.v2"
+            runtime_engine = ""
+            runtime_root = ""
+            privileged_without_host_devices = false
+            base_runtime_spec = ""
+            [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+              BinaryName = "nvidia-container-runtime"
+  become: yes
+
+- name: Restart k0s worker
+  systemd:
+    name: k0sworker
+    #name: containerd
+    state: restarted
+  become: yes

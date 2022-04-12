@@ -1,0 +1,26 @@
+---
+#
+# Spark k8s Operator
+#
+- name: Add spark k8s operator helm repository
+  kubernetes.core.helm_repository:
+    name: spark-operator
+    repo_url: https://googlecloudplatform.github.io/spark-on-k8s-operator
+
+- name: Install spark k8s operator
+  kubernetes.core.helm:
+    name: spark-operator
+    chart_ref: spark-operator/spark-operator
+    release_namespace: spark-operator
+    create_namespace: true
+#    values:
+#      sparkJobNamespace:
+#        spark-jobs
+#      serviceAccounts.spark.name:
+#        spark
+
+- name: Git clone spark k8s operator
+  git:
+    repo: https://github.com/GoogleCloudPlatform/spark-on-k8s-operator.git
+    dest: /home/mdxuser/spark-on-k8s-operator
+    force: yes

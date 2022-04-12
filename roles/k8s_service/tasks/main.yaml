@@ -1,0 +1,9 @@
+--- 
+- import_tasks: exascaler.yaml
+- import_tasks: gpu-operator.yaml
+- import_tasks: network-operator.yaml
+- import_tasks: metallb.yaml
+- import_tasks: prometheus.yaml
+- import_tasks: mpi-operator.yaml
+- import_tasks: spark-operator.yaml
+#- import_tasks: spark.yaml

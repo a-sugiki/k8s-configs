@@ -1,0 +1,42 @@
+---
+- name: Resolve build dependencies
+  apt:
+    name: '{{ item }}'
+  become: yes
+  loop:
+    - build-essential
+    - devscripts
+    - debhelper
+    - check
+    - libsubunit-dev
+    - fakeroot
+    - pkg-config
+    - dkms
+
+
+- name: Download GDRCopy
+  get_url:
+    url: https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v2.3.tar.gz
+    dest: /tmp/gdrcopy-2.3.tar.gz
+
+- name: Unarchive GDRCopy
+  unarchive:
+    src: /tmp/gdrcopy-2.3.tar.gz
+    dest: /tmp
+    remote_src: yes
+
+- name: Building GDRCopy
+  shell:
+    cmd: CUDA=/usr ./build-deb-packages.sh
+    chdir: /tmp/gdrcopy-2.3/packages
+
+- name: Install GDRCopy
+  command:
+    cmd: 'dpkg -i {{ item }}'
+    chdir: /tmp/gdrcopy-2.3/packages
+  become: yes
+  loop:
+    - gdrdrv-dkms_2.3-1_amd64.Ubuntu20_04.deb
+    - libgdrapi_2.3-1_amd64.Ubuntu20_04.deb
+    - gdrcopy-tests_2.3-1_amd64.Ubuntu20_04.deb  
+    - gdrcopy_2.3-1_amd64.Ubuntu20_04.deb        

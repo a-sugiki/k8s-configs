@@ -1,0 +1,33 @@
+---
+#
+# Install topology/cpu/memory managers
+#
+- name: Install topology/cpu/memory manager
+  lineinfile:
+    path: /etc/systemd/system/k0sworker.service
+    backrefs: yes
+    regexp: '--node-ip=(\S+)'
+    line: >
+      ExecStart=/usr/local/bin/k0s worker --token-file=/etc/k0s/k0stoken --kubelet-extra-args='--node-ip=\1 --topology-manager-scope=container --topology-manager-policy=single-numa-node --cpu-manager-policy=static --memory-manager-policy=Static --kube-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi --system-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi --reserved-memory=0:memory=1100Mi'
+    backup: yes
+  become: yes
+
+- name: Remove cpu_manager_state
+  file:
+    path: /var/lib/k0s/kubelet/cpu_manager_state
+    state: absent
+  become: yes
+
+- name: Remove memory_manager_state
+  file:
+    path: /var/lib/k0s/kubelet/memory_manager_state
+    state: absent
+  become: yes
+
+- name: Restart k0s worker
+  systemd:
+    name: k0sworker
+    daemon_reload: yes
+    state: restarted
+  become: yes
+

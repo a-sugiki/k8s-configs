@@ -1,0 +1,71 @@
+---
+#
+# Install exascaler CSI file driver
+#
+- name: Download exascaler CSI driver
+  git:
+    repo: https://github.com/DDNStorage/exa-csi-driver.git
+    dest: /home/mdxuser/exa-csi-driver
+
+- name: Install ctr (containerd)
+  apt:
+    name: containerd
+  become: yes
+
+- name: Install exascaler CSI driver
+  command:
+    cmd: ctr -n=k8s.io --address=/var/run/k0s/containerd.sock image import /home/mdxuser/exa-csi-driver/bin/exascaler-csi-file-driver.tar 
+  become: yes
+
+#
+# Install lustre client
+#
+- name: Stop kernel updates
+  command:
+    cmd: 'apt-mark hold linux-generic linux-image-generic linux-headers-generic'
+  become: yes
+
+- name: Copy lnet.conf.ddn
+  copy:
+    src: /etc/lnet.conf.ddn.j2
+    dest: /etc/lnet.conf.ddn
+  become: yes
+
+- name: Rewrite lnet.conf.ddn
+  lineinfile:
+    path: /etc/lnet.conf.ddn
+    backrefs: yes
+    regexp: '^(.*){{ item.pattern }}(.*)$'
+    line: '\1 {{ item.replace }}\2'
+    backup: yes
+  loop:
+    - { pattern: '\{\{ ib_src_ipaddr \}\}', replace: '{{ roce_host }}' }
+    - { pattern: '\{\{ ib_netif \}\}', replace: '{{ roce_netif }}' }
+    - { pattern: '\{\{ tcp_src_ipaddr \}\}', replace: '{{ roce_host }}' }
+    - { pattern: '\{\{ tcp_netif \}\}', replace: '{{ roce_netif }}' }
+  become: yes
+
+- name: Restart lustre client
+  systemd:
+    name: lustre_client
+    state: restarted
+    enabled: yes
+  become: yes
+
+- name: Rewrite /etc/fstab
+  lineinfile:
+    path: /etc/fstab
+    backrefs: yes
+    regexp: '{{ item }}'
+    line: '\1'
+    backup: yes
+  loop:
+    - '^#(172.17.8.40@o2ib10.*)$'
+    - '^#(172.17.8.56@o2ib10.*)$'
+  become: yes
+
+- name: Remount /fast and /large file systems
+  command:
+    cmd: mount --all
+    warn: false
+  become: yes

@@ -1,0 +1,22 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s-cluster
+spec:
+  hosts:
+{% for host in groups.kube_master %}
+  - ssh:
+      address: {{ host }}
+      user: mdxuser
+      port: 22
+    role: controller
+{% endfor %}
+{% for host in groups.kube_worker %}
+  - ssh:
+      address: {{ host }}
+      user: mdxuser
+      port: 22
+    role: worker
+{% endfor %}
+  k0s:
+    version: 1.23.3+k0s.1
