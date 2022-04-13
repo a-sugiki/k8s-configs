@@ -1,22 +1,22 @@
 ---
 - name: Download nv-peer-memory
   get_url: 
-    url: https://github.com/Mellanox/nv_peer_memory/archive/refs/tags/1.3-0.tar.gz
-    dest: /tmp/nvidia-peer-memory_1.3-0.tar.gz
+    url: https://github.com/Mellanox/nv_peer_memory/archive/refs/tags/{{ nv_peer_memory_version }}.tar.gz
+    dest: /tmp/nvidia-peer-memory_{{ nv_peer_memory_version }}.tar.gz
 
 - name: Unarchive nv-peer-memory
   unarchive:
-    src: /tmp/nvidia-peer-memory_1.3-0.tar.gz
+    src: /tmp/nvidia-peer-memory_{{ nv_peer_memory_version }}.tar.gz
     dest: /tmp
     remote_src: yes
 
 - name: Building nv-peer-memory
   command:
     cmd: dpkg-buildpackage -us -uc
-    chdir: /tmp/nv_peer_memory-1.3-0
+    chdir: /tmp/nv_peer_memory-{{ nv_peer_memory_version }}
 
 - name: Installing nv-peer-memory
   command:
-    cmd: dpkg -i nvidia-peer-memory-dkms_1.2-0_all.deb
+    cmd: dpkg -i nvidia-peer-memory-dkms_{{ nv_peer_memory_dkms_version }}_all.deb
     chdir: /tmp
   become: yes

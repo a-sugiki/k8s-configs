@@ -31,7 +31,7 @@
 
 - name: generate a server sertificate
   command:
-    cmd: openssl genrsa -out {{ server_name }}.key 4096
+    cmd: openssl genrsa -out {{ registry_server }}.key 4096
     chdir: '{{ harbor_cert_dir }}'
 
 - name: generate a CSR
@@ -39,7 +39,7 @@
     cmd: >
       openssl req -sha512 -new 
         -subj '{{ server_subject }}'
-        -key {{ server_name }}.key -out {{ server_name }}.csr
+        -key {{ registry_server }}.key -out {{ registry_server }}.csr
     chdir: '{{ harbor_cert_dir }}'
 
 - name: generate an x509v3 extension file
@@ -53,22 +53,22 @@
       openssl x509 -req -sha512 -days 3650 
         -extfile v3.ext 
         -CA ca.crt -CAkey ca.key -CAcreateserial 
-        -in {{ server_name }}.csr 
-        -out {{ server_name }}.crt
+        -in {{ registry_server }}.csr 
+        -out {{ registry_server }}.crt
     chdir: '{{ harbor_cert_dir }}'
 
 - name: Convert the certificate to PEM file
   command:
     cmd: >
       openssl x509 -inform PEM 
-        -in {{ server_name }}.crt 
-        -out {{ server_name }}.cert
+        -in {{ registry_server }}.crt 
+        -out {{ registry_server }}.cert
     chdir: '{{ harbor_cert_dir }}'
 
 - name: Fetch the PEM file
   fetch:
-    src: '{{ harbor_cert_dir }}/{{ server_name }}.crt'
-    dest: '{{ mdxuser_home }}/{{ server_name }}.crt'
+    src: '{{ harbor_cert_dir }}/{{ registry_server }}.crt'
+    dest: '{{ mdxuser_home }}/{{ registry_server }}.crt'
     flat: yes
 
 - name: Fetch the CA certificate file
@@ -87,19 +87,19 @@
   replace:
     path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'hostname: reg.mydomain.com'
-    replace: 'hostname: {{ server_name }}'
+    replace: 'hostname: {{ registry_server }}'
 
 - name: Replace harbor config file (2)
   replace:
     path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'certificate: /your/certificate/path'
-    replace: 'certificate: {{ harbor_cert_dir }}/{{ server_name }}.cert'
+    replace: 'certificate: {{ harbor_cert_dir }}/{{ registry_server }}.cert'
 
 - name: Replace harbor config file (3)
   replace:
     path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'private_key: /your/private/key/path'
-    replace: 'private_key: {{ harbor_cert_dir }}/{{ server_name }}.key'
+    replace: 'private_key: {{ harbor_cert_dir }}/{{ registry_server }}.key'
 
 #
 # TODO: generate a random password

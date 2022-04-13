@@ -5,7 +5,7 @@
 - name: Download exascaler CSI driver
   git:
     repo: https://github.com/DDNStorage/exa-csi-driver.git
-    dest: /home/mdxuser/exa-csi-driver
+    dest: '{{ mdxuser_home }}/exa-csi-driver'
 
 - name: Install ctr (containerd)
   apt:
@@ -13,8 +13,11 @@
   become: yes
 
 - name: Install exascaler CSI driver
-  command:
-    cmd: ctr -n=k8s.io --address=/var/run/k0s/containerd.sock image import /home/mdxuser/exa-csi-driver/bin/exascaler-csi-file-driver.tar 
+  command: 
+    cmd: >-
+      ctr -n=k8s.io
+        --address=/var/run/k0s/containerd.sock 
+        image import /home/mdxuser/exa-csi-driver/bin/exascaler-csi-file-driver.tar 
   become: yes
 
 #

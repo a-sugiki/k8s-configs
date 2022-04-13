@@ -36,7 +36,6 @@
 - name: Rewrite containerd.toml (3)
   replace:
     path: /etc/k0s/containerd.toml
-    #regexp: 'address = "/run/containerd.sock"'
     regexp: 'address = "/run/containerd/containerd.sock"'
     replace: 'address = "/var/lib/k0s/run/containerd.sock"'
   become: yes
@@ -67,6 +66,5 @@
 - name: Restart k0s worker
   systemd:
     name: k0sworker
-    #name: containerd
     state: restarted
   become: yes

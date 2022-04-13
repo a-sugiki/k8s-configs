@@ -4,24 +4,24 @@
 #
 - name: Install private certificate
   copy:
-    src: /home/mdxuser/harbor.internal.crt
+    src: '{{ mdxuser_home }}/{{ registry_server }}.crt'
     dest: /etc/ssl/certs/
   become: yes
 
 - name: Create cert directory
   file: 
-    path: /etc/containerd/certs.d/harbor.internal
+    path: /etc/containerd/certs.d/{{ registry_server }}
     state: directory
   become: yes
 
 - name: Install hosts.toml
   copy:
-    dest: /etc/containerd/certs.d/harbor.internal/hosts.toml
+    dest: /etc/containerd/certs.d/{{ registry_server }}/hosts.toml
     content: |
-      server = "https://harbor.internal"
+      server = "https://{{ registry_server }}"
       
-      [host."https://harbor.internal"]
+      [host."https://{{ registry_server }}"]
         capabilities = ["pull", "resolve"]
-        ca = "/etc/ssl/certs/harbor.internal.crt"
+        ca = "/etc/ssl/certs/{{ registry_server }}.crt"
   become: yes
 

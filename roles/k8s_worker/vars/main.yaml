@@ -1,0 +1,8 @@
+kubelet_extra_args: >-
+  --topology-manager-scope=container
+  --topology-manager-policy=single-numa-node 
+  --cpu-manager-policy=static 
+  --memory-manager-policy=Static 
+  --kube-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi 
+  --system-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi 
+  --reserved-memory=0:memory=1100Mi

@@ -3,18 +3,18 @@
   get_url:
     url: https://github.com/k0sproject/k0sctl/releases/download/v{{ k0sctl_version }}/k0sctl-linux-x64
     checksum: 'sha256:{{ k0sctl_checksum }}'
-    dest: /home/mdxuser/k0sctl
+    dest: '{{ mdxuser_home }}/k0sctl'
 
 - name: Install k0sctl
   copy:
-    src: /home/mdxuser/k0sctl
+    src: '{{ mdxuser_home }}/k0sctl'
     dest: /usr/local/bin/
     mode: '0755'
   become: yes
 
 - name: Delete k0sctl
   file:
-    path: /home/mdxuser/k0sctl
+    path: '{{ mdxuser_home }}/k0sctl'
     state: absent
 
 - name: Generate k0sctl configuration file
@@ -25,19 +25,19 @@
 - name: Create kubernetes cluster
   shell:
      cmd: k0sctl apply --config k0sctl.yaml
-     chdir: /home/mdxuser
+     chdir: '{{ mdxuser_home }}'
 
 - name: Create .kube directory
   file:
-    path: /home/mdxuser/.kube
+    path: '{{ mdxuser_home }}/.kube'
     state: directory
     mode: '0700'
 
 - name: Replace kubeconfig
   shell:
-     cmd: k0sctl kubeconfig > /home/mdxuser/.kube/config
+     cmd: k0sctl kubeconfig > {{ mdxuser_home }}/.kube/config
 
 - name: Chmod kubeconfig
   file:
-    path: /home/mdxuser/.kube/config
+    path: '{{ mdxuser_home }}/.kube/config'
     mode: '0600'

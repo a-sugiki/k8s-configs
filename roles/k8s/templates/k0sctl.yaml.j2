@@ -7,14 +7,14 @@ spec:
 {% for host in groups.kube_master %}
   - ssh:
       address: {{ host }}
-      user: mdxuser
+      user: {{ ansible_user }}
       port: 22
     role: controller
 {% endfor %}
 {% for host in groups.kube_worker %}
   - ssh:
       address: {{ host }}
-      user: mdxuser
+      user: {{ ansible_user }}
       port: 22
     role: worker
 {% endfor %}

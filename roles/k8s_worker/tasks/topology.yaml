@@ -8,7 +8,7 @@
     backrefs: yes
     regexp: '--node-ip=(\S+)'
     line: >
-      ExecStart=/usr/local/bin/k0s worker --token-file=/etc/k0s/k0stoken --kubelet-extra-args='--node-ip=\1 --topology-manager-scope=container --topology-manager-policy=single-numa-node --cpu-manager-policy=static --memory-manager-policy=Static --kube-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi --system-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi --reserved-memory=0:memory=1100Mi'
+      ExecStart=/usr/local/bin/k0s worker --token-file=/etc/k0s/k0stoken --kubelet-extra-args='--node-ip=\1 {{ kubelet_extra_args }}'
     backup: yes
   become: yes
 
