@@ -1,14 +1,14 @@
 ---
 - name: Create docker cert directory 
   file:
-    path: /etc/docker/certs.d/harbor.internal    
+    path: /etc/docker/certs.d/{{ registry_server }}
     state: directory
   become: yes
 
 - name: Install CA cert
   copy:
-    src: /home/mdxuser/ca.crt
-    dest: /etc/docker/certs.d/harbor.internal/
+    src: '{{ mdxuser_home }}/ca.crt'
+    dest: /etc/docker/certs.d/{{ registry_server }}
   become: yes
 
 - name: Install docker for creating images
