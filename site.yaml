@@ -10,6 +10,17 @@
 
 - name: Install harbor container registry
   hosts: registry
+  vars_files:
+    - vault.yaml
+  # vars_prompt:
+  #   - name: harbor_admin_password
+  #     prompt: Enter admin password for harbor
+  #     private: yes
+  #     default: "{{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
+  #   - name: harbor_db_password
+  #     prompt: Enter database password for harbor
+  #     private: yes
+  #     default: "{{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
   roles:
     - registry
   tags:
@@ -49,6 +60,13 @@
 
 - name: Deploy kubernetes services
   hosts: bastion_host
+  vars_files:
+    - vault.yaml
+  # vars_prompt:
+  #   - name: grafana_password
+  #     prompt: Enter grafana password
+  #     private: yes
+  #     default: "{{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
   roles:
     - k8s_service
   tags:

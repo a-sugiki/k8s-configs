@@ -13,3 +13,6 @@
     chart_ref: prometheus-community/kube-prometheus-stack
     release_namespace: prometheus
     create_namespace: true
+    values:
+      grafana:
+        adminPassword: '{{ grafana_password }}'

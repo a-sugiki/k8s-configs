@@ -1,0 +1,5 @@
+---
+harbor_admin_password:
+harbor_db_password:
+
+grafana_password:

@@ -101,23 +101,21 @@
     regexp: 'private_key: /your/private/key/path'
     replace: 'private_key: {{ harbor_cert_dir }}/{{ registry_server }}.key'
 
-#
-# TODO: generate a random password
-#
-#- name: Replace db password
-#  replace:
-#    path: '{{ harbor_dir }}/harbor.yml'
-#    regexp: 'harbor_admin_password: Harbor12345'
-#    replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
 
-#
-# TODO: generate a random password for DB
-#
-#- name: Replace db password
-#  replace:
-#    path: '{{ harbor_dir }}/harbor.yml'
-#    regexp: 'password: root123'
-#    replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
+- name: Replace db password
+  replace:
+    path: '{{ harbor_dir }}/harbor.yml'
+    regexp: 'harbor_admin_password: Harbor12345'
+    replace: 'harbor_admin_password: {{ harbor_admin_password }}'
+    # replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
+
+
+- name: Replace db password
+  replace:
+    path: '{{ harbor_dir }}/harbor.yml'
+    regexp: 'password: root123'
+    replace: 'password: {{ harbor_db_password }}'
+    # replace: "password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
 
 - name: Replace data volume
   replace:
