@@ -33,7 +33,7 @@
 - name: Install GDRCopy
   command:
     cmd: 'dpkg -i {{ item }}'
-    chdir: /tmp/gdrcopy-2.3/packages
+    chdir: /tmp/gdrcopy-{{ gdr_version }}/packages
   become: yes
   loop:
     - gdrdrv-dkms_{{ gdr_version_minor }}_amd64.Ubuntu20_04.deb

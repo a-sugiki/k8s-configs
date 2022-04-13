@@ -24,7 +24,7 @@
 - name: Download exascaler CSI driver
   git:
     repo: https://github.com/DDNStorage/exa-csi-driver.git
-    dest: /home/mdxuser/exa-csi-driver
+    dest: '{{ mdxuser_home }}/exa-csi-driver'
     force: yes
 
 - name: Rewrite exascaler CSI driver file 
@@ -45,4 +45,4 @@
   k8s:
     state: present
     namespace: '{{ exascaler_namespace }}'
-    src: /home/mdxuser/exa-csi-driver/deploy/kubernetes/exascaler-csi-file-driver.yaml
+    src: '{{ mdxuser_home }}/exa-csi-driver/deploy/kubernetes/exascaler-csi-file-driver.yaml'

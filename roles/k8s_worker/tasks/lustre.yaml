@@ -17,7 +17,7 @@
     cmd: >-
       ctr -n=k8s.io
         --address=/var/run/k0s/containerd.sock 
-        image import /home/mdxuser/exa-csi-driver/bin/exascaler-csi-file-driver.tar 
+        image import {{ mdxuser_home }}/exa-csi-driver/bin/exascaler-csi-file-driver.tar 
   become: yes
 
 #

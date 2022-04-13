@@ -19,5 +19,5 @@
           - name: default
             protocol: layer2
             addresses:
-            - 10.18.20.200-10.18.20.210
+            - '{{ metallb_addresses }}'
 
