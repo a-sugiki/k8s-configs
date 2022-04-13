@@ -1,8 +1,8 @@
 ---
 - name: Donwload k0sctl
   get_url:
-    url: https://github.com/k0sproject/k0sctl/releases/download/v0.12.6/k0sctl-linux-x64
-    checksum: sha256:5e5e810f47457c0f35cb8d89d684d8854b6b12922be927118a16e5f7ae1ecdae
+    url: https://github.com/k0sproject/k0sctl/releases/download/v{{ k0sctl_version }}/k0sctl-linux-x64
+    checksum: 'sha256:{{ k0sctl_checksum }}'
     dest: /home/mdxuser/k0sctl
 
 - name: Install k0sctl
