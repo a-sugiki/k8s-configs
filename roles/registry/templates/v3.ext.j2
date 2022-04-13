@@ -6,5 +6,5 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1=harbor
-DNS.2=harbor.internal
+DNS.2=harbor.{{ internal_domain }}
 DNS.3={{ ansible_default_ipv4.address }}

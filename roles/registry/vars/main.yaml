@@ -1,0 +1,10 @@
+---
+harbor_version: 2.4.2
+
+harbor_dir: '{{ mdxuser_home }}/harbor'
+harbor_cert_dir: '{{ harbor_dir }}/cert'
+harbor_data_dir: '{{ harbor_dir }}/data'
+
+ca_subject: '/C=JP/ST=Chiba/L=Kashiwa/O=MDX/OU=Private/CN=harbor.{{ internal_domain }}'
+server_subject: '/C=JP/ST=Chiba/L=Kashiwa/O=MDX/OU=Private/CN=harbor.{{ internal_domain }}'
+server_name: 'harbor.{{ internal_domain}}'

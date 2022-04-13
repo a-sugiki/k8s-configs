@@ -1,51 +1,51 @@
 ---
 - name: Download harbor installer
   get_url:
-    url: https://github.com/goharbor/harbor/releases/download/v2.4.2/harbor-online-installer-v2.4.2.tgz
-    dest: /home/mdxuser/
+    url: https://github.com/goharbor/harbor/releases/download/v{{ harbor_version }}/harbor-online-installer-v{{ harbor_version }}.tgz
+    dest: '{{ mdxuser_home }}'
 
 - name: Uncompress harbor installler
   unarchive:
-    src: /home/mdxuser/harbor-online-installer-v2.4.2.tgz
-    dest: /home/mdxuser/
+    src: /home/mdxuser/harbor-online-installer-v{{ harbor_version }}.tgz
+    dest: '{{ mdxuser_home }}'
     remote_src: yes
 
 - name: Create a certificate directory
   file: 
-    path: /home/mdxuser/harbor/cert
+    path: '{{ harbor_cert_dir }}'
     state: directory
 
 - name: generate a CA private key
   command:
     cmd: openssl genrsa -out ca.key 4096
-    chdir: /home/mdxuser/harbor/cert
+    chdir: '{{ harbor_cert_dir }}'
 
 - name: generate a CA certificate
   command: 
     cmd: >
       openssl req -x509 -new -nodes 
         -sha512 -days 3650 
-        -subj "/C=JP/ST=Chiba/L=Kashiwa/O=MDX/OU=Private/CN=harbor.internal" 
+        -subj '{{ ca_subject }}'
         -key ca.key -out ca.crt
-    chdir: /home/mdxuser/harbor/cert
+    chdir: '{{ harbor_cert_dir }}'
 
 - name: generate a server sertificate
   command:
-    cmd: openssl genrsa -out harbor.internal.key 4096
-    chdir: /home/mdxuser/harbor/cert
+    cmd: openssl genrsa -out {{ server_name }}.key 4096
+    chdir: '{{ harbor_cert_dir }}'
 
 - name: generate a CSR
   command:
     cmd: >
       openssl req -sha512 -new 
-        -subj "/C=JP/ST=Chiba/L=Kashiwa/O=MDX/OU=Private/CN=harbor.internal" 
-        -key harbor.internal.key -out harbor.internal.csr
-    chdir: /home/mdxuser/harbor/cert
+        -subj '{{ server_subject }}'
+        -key {{ server_name }}.key -out {{ server_name }}.csr
+    chdir: '{{ harbor_cert_dir }}'
 
 - name: generate an x509v3 extension file
   template:
     src: templates/v3.ext.j2
-    dest: /home/mdxuser/harbor/cert/v3.ext
+    dest: '{{ harbor_cert_dir }}/v3.ext'
 
 - name: Replace the x509 certificate
   command:
@@ -53,60 +53,60 @@
       openssl x509 -req -sha512 -days 3650 
         -extfile v3.ext 
         -CA ca.crt -CAkey ca.key -CAcreateserial 
-        -in harbor.internal.csr 
-        -out harbor.internal.crt
-    chdir: /home/mdxuser/harbor/cert
+        -in {{ server_name }}.csr 
+        -out {{ server_name }}.crt
+    chdir: '{{ harbor_cert_dir }}'
 
 - name: Convert the certificate to PEM file
   command:
     cmd: >
       openssl x509 -inform PEM 
-        -in harbor.internal.crt 
-        -out harbor.internal.cert
-    chdir: /home/mdxuser/harbor/cert
+        -in {{ server_name }}.crt 
+        -out {{ server_name }}.cert
+    chdir: '{{ harbor_cert_dir }}'
 
 - name: Fetch the PEM file
   fetch:
-    src: harbor/cert/harbor.internal.crt
-    dest: /home/mdxuser/harbor.internal.crt
+    src: '{{ harbor_cert_dir }}/{{ server_name }}.crt'
+    dest: '{{ mdxuser_home }}/{{ server_name }}.crt'
     flat: yes
 
 - name: Fetch the CA certificate file
   fetch:
-    src: harbor/cert/ca.crt
-    dest: /home/mdxuser/ca.crt
+    src: '{{ harbor_cert_dir }}/ca.crt'
+    dest: '{{ mdxuser_home }}/ca.crt'
     flat: yes
 
 - name: Copy harbor config file
   copy:
-    src: harbor/harbor.yml.tmpl
-    dest: harbor/harbor.yml
+    src: '{{ harbor_dir }}/harbor.yml.tmpl'
+    dest: '{{ harbor_dir }}/harbor.yml'
     remote_src: yes
 
 - name: Replace harbor config file
   replace:
-    path: harbor/harbor.yml
+    path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'hostname: reg.mydomain.com'
-    replace: 'hostname: harbor.internal'
+    replace: 'hostname: {{ server_name }}'
 
 - name: Replace harbor config file (2)
   replace:
-    path: harbor/harbor.yml
+    path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'certificate: /your/certificate/path'
-    replace: 'certificate: /home/mdxuser/harbor/cert/harbor.internal.cert'
+    replace: 'certificate: {{ harbor_cert_dir }}/{{ server_name }}.cert'
 
 - name: Replace harbor config file (3)
   replace:
-    path: harbor/harbor.yml
+    path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'private_key: /your/private/key/path'
-    replace: 'private_key: /home/mdxuser/harbor/cert/harbor.internal.key'
+    replace: 'private_key: {{ harbor_cert_dir }}/{{ server_name }}.key'
 
 #
 # TODO: generate a random password
 #
 #- name: Replace db password
 #  replace:
-#    path: harbor/harbor.yml
+#    path: '{{ harbor_dir }}/harbor.yml'
 #    regexp: 'harbor_admin_password: Harbor12345'
 #    replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
 
@@ -115,15 +115,15 @@
 #
 #- name: Replace db password
 #  replace:
-#    path: harbor/harbor.yml
+#    path: '{{ harbor_dir }}/harbor.yml'
 #    regexp: 'password: root123'
 #    replace: "harbor_admin_password: {{ lookup('password', '/dev/null chars=ascii_uppercase,ascii_lowercase,digits length=20') }}"
 
 - name: Replace data volume
   replace:
-    path: harbor/harbor.yml
+    path: '{{ harbor_dir }}/harbor.yml'
     regexp: 'data_volume: /data'
-    replace: 'data_volume: /home/mdxuser/harbor/data'
+    replace: 'data_volume: {{ harbor_data_dir }}'
 
 - name: Install docker
   apt:
@@ -145,12 +145,12 @@
 - name: Prepare harbor
   command:
     cmd: ./prepare
-    chdir: /home/mdxuser/harbor
+    chdir: '{{ harbor_dir }}'
   become: yes
 
 - name: Install harbor
   command:
     cmd: ./install.sh
-    chdir: /home/mdxuser/harbor
+    chdir: '{{ harbor_dir }}'
   become: yes
 
