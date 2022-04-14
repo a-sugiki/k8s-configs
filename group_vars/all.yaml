@@ -1,6 +1,7 @@
 ---
 ansible_user: mdxuser
 mdxuser_home: /home/mdxuser
+mdxuser_uid: 1000
 
 internal_domain: internal
 roce_suffix: roce

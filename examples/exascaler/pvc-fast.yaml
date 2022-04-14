@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: exascaler-pvc-fast
+spec:
+  storageClassName: exascaler-sc-fast
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi

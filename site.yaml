@@ -58,6 +58,27 @@
   - all
   - never
 
+- name: Collect lustre project id
+  hosts: kube_worker[0]
+  tasks:
+    - name: Create an empty file on /fast lustre file system
+      file:
+        path: /fast/test
+        state: touch
+      become: yes
+    - name: Get the project id from lfs project command
+      shell:
+        cmd: lfs project /fast
+      register: project_id
+    # - name: Show project id
+    #   debug:
+    #     msg: '{{ project_id.stdout_lines[0].split(" ")[0] }}'
+  tags:
+  - service
+  - k8s
+  - all
+  - never
+
 - name: Deploy kubernetes services
   hosts: bastion_host
   vars_files:

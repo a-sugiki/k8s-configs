@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: exascaler-pvc-large
+spec:
+  storageClassName: exascaler-sc-large
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Mi

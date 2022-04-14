@@ -46,3 +46,50 @@
     state: present
     namespace: '{{ exascaler_namespace }}'
     src: '{{ mdxuser_home }}/exa-csi-driver/deploy/kubernetes/exascaler-csi-file-driver.yaml'
+
+
+- name: Debug
+  debug:
+    msg: "{{ hostvars[groups['kube_worker'][0]].project_id.stdout_lines[0].split(' ')[0] }}"
+
+- name: Debug2
+  debug:
+    msg: "{{ mdxuser_uid }}"
+
+- name: Create storage class for /fast
+  k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: exascaler-sc-fast
+      provisioner: exa.csi.ddn.com
+      mountOptions:
+        # - noatime
+      parameters:
+        projectId: "{{ hostvars[groups['kube_worker'][0]].project_id.stdout_lines[0].split(' ')[0] }}"
+        exaMountUid: "{{ mdxuser_uid | int }}"
+        bindMount: "false"
+        exaFS: "172.17.8.40@o2ib10:172.17.8.41@o2ib10:/fast"
+        mountPoint: "/fast"
+        mountOptions: "network=o2ib10,flock,noauto,defaults"
+
+- name: Create storage class for /large
+  k8s:
+    state: present
+    definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: exascaler-sc-large
+      provisioner: exa.csi.ddn.com
+      mountOptions:
+        # - noatime
+      parameters:
+        projectId: "{{ hostvars[groups['kube_worker'][0]].project_id.stdout_lines[0].split(' ')[0] }}"
+        exaMountUid: "{{ mdxuser_uid | int }}"
+        bindMount: "false"
+        exaFS: "172.17.8.56@o2ib10:172.17.8.57@o2ib10:/large"
+        mountPoint: /large
+        mountOptions: network=o2ib10,flock,noauto,defaults
