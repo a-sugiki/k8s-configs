@@ -5,10 +5,10 @@
 - name: Download MPI operator
   git:
     repo: https://github.com/kubeflow/mpi-operator
-    dest: /home/mdxuser/mpi-operator
+    dest: '{{ mdxuser_home }}/mpi-operator'
     force: yes
 
 - name: Install MPI operator
   k8s:
     state: present
-    src: /home/mdxuser/mpi-operator/deploy/v2beta1/mpi-operator.yaml
+    src: '{{ mdxuser_home }}/mpi-operator/deploy/v2beta1/mpi-operator.yaml'

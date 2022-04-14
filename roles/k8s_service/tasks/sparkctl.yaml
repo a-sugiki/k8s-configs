@@ -8,10 +8,10 @@
 - name: Build sparkctl
   command:
     cmd: ./build.sh
-    chdir /home/mdxuser/spark-on-k8s-operator/sparkctl
+    chdir '{{ mdxuser_home }}/spark-on-k8s-operator/sparkctl'
 
 - name: Rename (relocate) sparkctl
   copy: 
-    src: /home/mdxuser/spark-on-k8s-opeartor/sparkctl-linux-amd64
+    src: '{{ mdxuser_home }}/spark-on-k8s-opeartor/sparkctl-linux-amd64'
     dest: /usr/local/bin/sparkctl
   become: yes

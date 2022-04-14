@@ -22,5 +22,5 @@
 - name: Git clone spark k8s operator
   git:
     repo: https://github.com/GoogleCloudPlatform/spark-on-k8s-operator.git
-    dest: /home/mdxuser/spark-on-k8s-operator
+    dest: '{{ mdxuser_home }}/spark-on-k8s-operator'
     force: yes
