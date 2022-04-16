@@ -1,0 +1,8 @@
+---
+spark_jobs_namespace: spark-jobs
+spark_image_dir: '{{ mdxuser_home }}/spark-rapids-ucx-image'
+
+registry_dir: library
+
+spark_image_name: spark-rapids-ucx
+spark_image_tag: latest

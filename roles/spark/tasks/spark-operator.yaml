@@ -7,6 +7,12 @@
     name: spark-operator
     repo_url: https://googlecloudplatform.github.io/spark-on-k8s-operator
 
+#- name: Create spark job namespace
+#  k8s:
+#    kind: Namespace
+#    name: '{{ spark_jobs_namespace }}'
+#    state: present
+
 - name: Install spark k8s operator
   kubernetes.core.helm:
     name: spark-operator
@@ -15,7 +21,7 @@
     create_namespace: true
 #    values:
 #      sparkJobNamespace:
-#        spark-jobs
+#        '{{ spark_jobs_namespace }}'
 #      serviceAccounts.spark.name:
 #        spark
 

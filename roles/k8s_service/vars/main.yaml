@@ -3,3 +3,5 @@ exascaler_namespace: exascaler
 #exascaler_namespace: default
 
 metallb_addresses: 10.18.20.200-10.18.20.210
+
+#spark_jobs_namespace: spark-jobs

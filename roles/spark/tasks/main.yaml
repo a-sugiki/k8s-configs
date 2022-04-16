@@ -1,0 +1,4 @@
+---
+- import_tasks: spark-operator.yaml
+- import_tasks: sparkctl.yaml
+- import_tasks: spark-image.yaml

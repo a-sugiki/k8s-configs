@@ -1,0 +1,81 @@
+---
+- name: Docker login
+  shell:
+    cmd: echo {{ harbor_admin_password }} | docker login {{ registry_server }} --username admin --password-stdin
+  become: yes
+
+- name: Create a directory for building docker image
+  file:
+    path: '{{ spark_image_dir }}'
+    state: directory
+
+- name: Download and unarchive Apache Spark
+  unarchive:
+    src: https://dlcdn.apache.org/spark/spark-3.2.1/spark-3.2.1-bin-hadoop3.2.tgz
+    dest: '{{ spark_image_dir }}'
+    remote_src: yes
+
+#- name: Make a symbolic link
+#  file: 
+#    src: '{{ spark_image_dir }}/spark-3.2.1-bin-hadoop3.2'
+#    dest: '{{ spark_image_dir }}/spark'
+#    state: link
+
+- name: Copy Spark directory
+  copy:
+    src: '{{ spark_image_dir }}/spark-3.2.1-bin-hadoop3.2'
+    dest: '{{ spark_image_dir }}/spark'
+    remote_src: true
+
+- name: Download RAPIDS
+  get_url:
+    url: https://repo1.maven.org/maven2/com/nvidia/rapids-4-spark_2.12/22.02.0/rapids-4-spark_2.12-22.02.0.jar
+    dest: '{{ spark_image_dir }}'
+    
+- name: Download CUDF
+  get_url:
+    url: https://repo1.maven.org/maven2/ai/rapids/cudf/22.02.0/cudf-22.02.0-cuda11.jar
+    dest: '{{ spark_image_dir }}'
+
+- name: Download GPU discovery script (getGpusResource.sh)
+  get_url:
+    url: https://github.com/apache/spark/blob/master/examples/src/main/scripts/getGpusResources.sh
+    dest: '{{ spark_image_dir }}'
+
+- name: Download Dockerfile.ubuntu_rdma
+  get_url:
+    url: https://nvidia.github.io/spark-rapids/docs/additional-functionality/shuffle-docker-examples/Dockerfile.ubuntu_rdma
+    dest: '{{ spark_image_dir }}'
+
+- name: Download Dockerfile.cuda
+  get_url:
+    url: https://nvidia.github.io/spark-rapids/docs/get-started/Dockerfile.cuda
+    dest: '{{ spark_image_dir }}'
+
+- name: Comment out the FROM line in the docker file 
+  replace:
+    dest: '{{ spark_image_dir }}/Dockerfile.cuda'
+    regexp: '^(FROM.*)$'
+    replace: '#\1'
+
+- name: Create a Dockerfile
+  shell:
+    cmd: cat Dockerfile.ubuntu_rdma > Dockerfile
+    chdir: '{{ spark_image_dir }}'
+
+- name: Append content to the Dockerfile
+  shell:
+    cmd: cat Dockerfile.cuda >> Dockerfile
+    chdir: '{{ spark_image_dir }}'
+
+- name: Build a docker image
+  command:
+    cmd: docker build . -t {{ registry_server }}/{{ registry_dir }}/{{ spark_image_name }}:{{ spark_image_tag }}
+    chdir: '{{ spark_image_dir }}'
+  become: yes
+
+- name: Push the docker image
+  command:
+    cmd: docker push {{ registry_server }}/{{ registry_dir }}/{{ spark_image_name }}:{{ spark_image_tag }}
+    chdir: '{{ spark_image_dir }}'
+  become: yes

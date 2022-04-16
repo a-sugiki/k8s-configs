@@ -1,0 +1,18 @@
+---
+- name: Install golang
+  apt:
+    name: golang-go
+    state: present
+  become: yes
+
+- name: Build sparkctl
+  command:
+    cmd: ./build.sh
+    chdir: '{{ mdxuser_home }}/spark-on-k8s-operator/sparkctl'
+
+- name: Rename sparkctl
+  copy:
+    src: '{{ mdxuser_home }}/spark-on-k8s-operator/sparkctl/sparkctl-linux-amd64'
+    dest: /usr/local/bin/sparkctl
+    mode: '0755'
+  become: yes
