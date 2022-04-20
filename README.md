@@ -165,6 +165,21 @@ Please refer the [MPI operator's document](https://github.com/kubeflow/mpi-opera
 ### Running Spark applications
 Please refer [Spark RAPIDS document](https://nvidia.github.io/spark-rapids/docs/get-started/getting-started-kubernetes.html).
 
+## NUMA-aware resource management
+
+The default playbook reserves the following resources for the underlying kubelet and system daemons. More specifically, it reserves a single CPU core and 1GB memory, and 2GB ephemeral storage for not using them to Kubernetes pods. If you want to run a Kubernetes cluster in more limited host resourcees or to change the policies or the amount of reserved resources, change the ``k8s-configs/roles/k8s_worker/vars/main.yaml`` file accordingly.
+
+```yaml
+kubelet_extra_args: >-
+  --topology-manager-scope=container
+  --topology-manager-policy=single-numa-node 
+  --cpu-manager-policy=static 
+  --memory-manager-policy=Static 
+  --kube-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi 
+  --system-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi 
+  --reserved-memory=0:memory=1100Mi
+```
+
 ## Known issues and limitations
 
 - Apache Spark jobs don't work properly due to bugs at this time.
