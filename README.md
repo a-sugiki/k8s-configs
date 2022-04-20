@@ -75,7 +75,7 @@ $ encrypt_vault.sh
 $ play.sh
 ```
 
-## How to use this platform
+## How to use the cluster
 
 The ``examples`` directory contains some sample manifest files to show how to use the cluster.
 
