@@ -167,6 +167,35 @@ NVIDIA GPU operator supports MIG. This playbook doesn't enable MIG by default, b
 bastion:~$ kubectl label nodes kube-gpu1 nvidia.com/mig.config=all-1g.5gb
 ```
 
+### SR-IOV networking
+
+SR-IOV networking is supported as a secondary network in a pod by using [Multus](https://github.com/k8snetworkplumbingwg/multus-cni) and [Whereabouts](https://github.com/k8snetworkplumbingwg/whereabouts).
+
+To use this feature, write a network attachment definition:
+```yaml
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "name": "rdma-ipvlan-conf",
+      "type": "ipvlan",
+      "master": "ens192",
+      "mode": "l2",
+      "ipam": {
+        "type": "whereabouts",
+        "range": "10.146.16.0/21",
+        "range_start": "10.146.18.100",
+        "range_end": "10.146.18.120",
+        "log_file": "/tmp/whereabouts.log",
+        "log_level": "debug"
+      }
+    }'
+```
+and add an annotation to the pod definition:
+```yaml
+    annotations:
+      "k8s.v1.cni.cncf.io/networks": "rdma-ipvlan-conf"
+```
+
 ### Running parallel jobs
 Please refer the [MPI operator's document](https://github.com/kubeflow/mpi-operator).
 
