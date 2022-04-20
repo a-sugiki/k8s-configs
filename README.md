@@ -161,8 +161,11 @@ Allocatable:
 ```  
 
 ### MIG (multi-instance GPU) support 
-
 NVIDIA GPU operator supports MIG. This playbook doesn't enable MIG by default, but it can be enabled by [configuring MIG profiles](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/gpu-operator-mig.html).
+
+```sh
+bastion:~$ kubectl label nodes kube-gpu1 nvidia.com/mig.config=all-1g.5gb
+```
 
 ### Running parallel jobs
 Please refer the [MPI operator's document](https://github.com/kubeflow/mpi-operator).
