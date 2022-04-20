@@ -169,3 +169,9 @@ Please refer [Spark RAPIDS document](https://nvidia.github.io/spark-rapids/docs/
 
 - Apache Spark jobs don't work properly due to bugs at this time.
 - Virtual machines must be set up manually in the current mdx configuration.
+
+## Future work
+- Support for Strimzi Kafka Operator
+- Support for JupyterHub/BinderHub Operators
+- Support for MySQL Operator
+- Data tranfer and processing between S3-compatible object storage
