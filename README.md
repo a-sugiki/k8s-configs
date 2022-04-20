@@ -53,16 +53,45 @@ $ sudo apt install ansible
 $ install_dep_packages.py
 ```
 
-3. Copy the inventory file from the template and rewrite the file accordingly. At least, fill in the IP addresses of each node (by ansible_host and roce_host). Copy the kube-node and kube-gpu entries as needed.
+3. Copy the inventory file from the template and rewrite the file accordingly. 
 ```sh
 $ cp inventory.ini.template inventory.ini
 $ mg inventory.ini
 ```
+At least, fill in the IP addresses of each node (by ansible_host and roce_host). Copy the kube-node and kube-gpu entries as needed.
+```ansible
+[bastion_host]
+bastion ansible_host=
 
-4. Copy the password file from the template and rewrite it. Set the harbor's admin and database passwords and grafana password.
+[registry]
+harbor ansible_host=
+
+[kube_master]
+kube-master ansible_host=
+
+[kube_node]
+kube-node1 ansible_host= roce_host=
+kube-node2 ansible_host= roce_host=
+
+[kube_gpu]
+kube-gpu1 ansible_host= roce_host=
+kube-gpu2 ansible_host= roce_host=
+```
+
+4. Copy the password file from the template and rewrite it. 
 ```sh
 $ cp vault.yaml.template vault.yaml
 $ mg vault.yaml
+```
+
+Set the harbor's admin and database passwords and grafana password.
+
+```yaml
+---
+harbor_admin_password:
+harbor_db_password:
+
+grafana_password:
 ```
 
 5. Encrypt the above file by Ansible Vault (set the Vault password).
