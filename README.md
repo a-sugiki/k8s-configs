@@ -5,6 +5,7 @@ This [Ansible](https://www.ansible.com/) playbook offers a highly-optimized [Kub
 The playbook automatically installs the following components as a usable form within 10 minites:
 - [k0s](https://k0sproject.io/) (a light-weight Kubernetes distribution)
 - [containerd](https://containerd.io/) and nvidia container runtime (as container runtimes on computing nodes)
+- [Topology](https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/), [CPU](https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/), and [memory managers](https://kubernetes.io/docs/tasks/administer-cluster/memory-manager/) (for NUMA-aware, static resource partitioning)
 - [Docker](https://www.docker.com/) (for building container images on the bastion host)
 - [Harbor](https://goharbor.io/) private container repository with private self-certificate 
 - [Exascaler File CSI driver](https://github.com/DDNStorage/exa-csi-driver) (as a container persistent volume driver)
@@ -18,7 +19,7 @@ This playbook was written being inspired from the [machine-configs](https://gith
 
 ## Prerequisites
 
-This playbook assumes the following Ubuntu 20.04 based virtual machines exist in a user tenant.
+This playbook assumes the following virtual machines exist in a user tenant. All machines should be installed with Ubuntu 20.04 server.
 
 - a single bastion host 
   - with 1 or a higher number of CPU cores, PortGroup networking
@@ -82,7 +83,7 @@ The examples directory stores some example manifest files.
 The kubectl and helm commands are installed on the bastion host.
 
 ```sh
-mdxuser@bastion:~$ kubectl get node
+bastion:~$ kubectl get node
 NAME         STATUS   ROLES    AGE    VERSION
 kube-gpu1    Ready    <none>   6d9h   v1.23.3+k0s
 kube-gpu2    Ready    <none>   6d9h   v1.23.3+k0s
@@ -100,7 +101,7 @@ apiVersion: v1
 clusters:
 - cluster:
     certificate-authority-data: ...
-    server: https://kube-master:6443
+    server: https://kube-master:6443 # to localhost or 127.0.0.1
   name: k0s-cluster
 ```
 
@@ -117,12 +118,50 @@ Harbor accepts connections on 443 port of the Harbor host. Use SSH port forwardi
 ```
 Harbor's admin password was set during installation.
 
+### Pusing container images to Harbor
+
+Before pusing a container image to the Harbor, the user must login to the Harbor registory.
+
+```sh
+bastion:~$ sudo docker login harbor.internal
+bastion:~$ sudo docker build . -t harbor.internal/library/<image name>:<tag>
+bastion:~$ sudo docker push harbor.internal/library/<image name>:<tag>
+```
+
 ### Accessing Grafana
 To access Grafana dashboard, use the ``kubectl port-forward`` and SSH port forwarding. The Grafana's password was set in ``vault.yaml`` during installation process.
 
 To make the access more persistent, use the LoadBalancer service instead of default one (Please see ``examples/grafana`` directory).
 
+### Using persistent volumes
+
+Two storage classes are predefined during installation. Write PVC (persistent volume claim) and Pod manifest files to use a persistent volume in a pod.
+
+```sh
+bastion:~$ kubectl get sc
+NAME                 PROVISIONER       RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+exascaler-sc-fast    exa.csi.ddn.com   Delete          Immediate           false                  5d18h
+exascaler-sc-large   exa.csi.ddn.com   Delete          Immediate           false                  5d18h
+```
+### Using GPUs and RDMA devices
+
+GPUs and RDMA devices are defined as allocatable resourcees on nodes.
+
+```sh
+$ kubectl describe node kube-gpu1
+...
+Addresses:
+  Hostname:    kube-gpu1
+Capacity:
+  nvidia.com/gpu:           1
+  rdma/rdma_shared_device:  1k
+Allocatable:
+  nvidia.com/gpu:           1
+  rdma/rdma_shared_device:  1k
+```  
+
+
 ## Known issues and limitations
 
-- Apache Spark jobs don't work properly at this time.
-- In the current mdx, virtual machines must be set up manually.
+- Apache Spark jobs don't work properly due to bugs at this time.
+- Virtual machines must be set up manually in the current mdx configuration.
