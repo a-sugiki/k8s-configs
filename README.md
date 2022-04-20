@@ -171,7 +171,7 @@ Please refer [Spark RAPIDS document](https://nvidia.github.io/spark-rapids/docs/
 - Virtual machines must be set up manually in the current mdx configuration.
 
 ## Future work
-- Support for Strimzi Kafka Operator
+- Support for [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
 - Support for JupyterHub/BinderHub Operators
-- Support for MySQL Operator
+- Support for [MySQL Operator](https://github.com/mysql/mysql-operator)
 - Data tranfer and processing between S3-compatible object storage
