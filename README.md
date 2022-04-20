@@ -75,9 +75,9 @@ $ encrypt_vault.sh
 $ play.sh
 ```
 
-The examples directory stores some example manifest files.
-
 ## How to use this platform
+
+The ``examples`` directory contains some sample manifest files to show how to use the cluster.
 
 ### Using kubectl and helm
 The kubectl and helm commands are installed on the bastion host.
