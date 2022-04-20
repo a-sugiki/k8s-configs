@@ -199,6 +199,16 @@ and add an annotation to the pod definition:
     annotations:
       "k8s.v1.cni.cncf.io/networks": "rdma-ipvlan-conf"
 ```
+### Using LoadBalancer
+
+MetalLB automatically assigns public IP addresses (which are opened to the outside of the cluster) to Services from the pooled address range. It can be used by specifiyng the ``LoadBalancer`` type in a Kubernetes service definition.
+
+The pooled addresses can be configured in ``k8s-configs/roles/k8s_service/vars/main.yaml``.
+```yaml
+metallb_addresses: 10.18.20.200-10.18.20.210
+````
+
+To make it globally accessible from the outside of the mdx, please configure the DNAT and ACL entries from the mdx's user portal.
 
 ### Running parallel jobs
 Please refer the [MPI operator's document](https://github.com/kubeflow/mpi-operator).
