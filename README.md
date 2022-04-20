@@ -159,6 +159,11 @@ Allocatable:
   nvidia.com/gpu:           1
   rdma/rdma_shared_device:  1k
 ```  
+
+### MIG (multi-instance GPU) support 
+
+NVIDIA GPU operator supports MIG. This playbook doesn't enable MIG by default, but it can be enabled by [configuring MIG profiles](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/gpu-operator-mig.html).
+
 ### Running parallel jobs
 Please refer the [MPI operator's document](https://github.com/kubeflow/mpi-operator).
 
