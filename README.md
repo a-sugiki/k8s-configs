@@ -173,6 +173,10 @@ SR-IOV networking is supported as a secondary network in a pod by using [Multus]
 
 To use this feature, write a network attachment definition:
 ```yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: rdma-ipvlan-conf
 spec:
   config: '{
       "cniVersion": "0.3.0",
