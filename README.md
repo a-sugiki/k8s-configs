@@ -218,7 +218,7 @@ Please refer [Spark RAPIDS document](https://nvidia.github.io/spark-rapids/docs/
 
 ## NUMA-aware resource management
 
-The default playbook reserves the following resources for the underlying kubelet and system daemons. More specifically, it reserves a single CPU core and 1GB memory, and 2GB ephemeral storage for not using them to Kubernetes pods. If you want to run a Kubernetes cluster in more limited host resources or to change the management policies or the amount of reserved resources, change the ``k8s-configs/roles/k8s_worker/vars/main.yaml`` file accordingly.
+The default playbook reserves the following resources for the underlying kubelet and system daemons. More specifically, it reserves a single CPU core and 1.1GB memory, and 2GB ephemeral storage for not using them to Kubernetes pods. If you want to run a Kubernetes cluster in more limited host resources or to change the management policies or the amount of reserved resources, change the ``k8s-configs/roles/k8s_worker/vars/main.yaml`` file accordingly.
 
 ```yaml
 kubelet_extra_args: >-
