@@ -4,8 +4,10 @@ This [Ansible](https://www.ansible.com/) playbook offers a highly-optimized [Kub
 
 The playbook automatically installs the following components as a usable form within 10 minites:
 - [k0s](https://k0sproject.io/) (a light-weight Kubernetes distribution)
+- [containerd](https://containerd.io/) and nvidia container runtime (as container runtimes on computing nodes)
+- [Docker](https://www.docker.com/) (for building container images on the bastion host)
 - [Harbor](https://goharbor.io/) private container repository with private self-certificate 
-- [Exascaler File CSI driver](https://github.com/DDNStorage/exa-csi-driver) (as a container persistent storage driver)
+- [Exascaler File CSI driver](https://github.com/DDNStorage/exa-csi-driver) (as a container persistent volume driver)
 - [NVIDIA's GPU](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/overview.html) and [network operators](https://docs.nvidia.com/networking/display/COKAN10/Network+Operator) (for A100 GPUs and ROCEv2 networking)
 - [MetalLB](https://metallb.universe.tf/) (as a load balancer)
 - [MPI operator](https://github.com/kubeflow/mpi-operator) (for supporting parallel computing jobs)
@@ -23,13 +25,20 @@ This playbook assumes the following Ubuntu 20.04 based virtual machines exist in
 - a single harbor private repository host
   - with 2 or a higher number of CPU cores, 160GB or larger disk capacity, PortGroup networking
 - a single kubernetes master node 
-  - 2 or a higher number of CPU cores, PortGroup networking
+  - with 2 or a higher number of CPU cores, PortGroup networking
 - 0 or a larger number of kubernetes' computing nodes. 
-  - with 2 or a higher number of CPU cores, 100GB or larger disk capacity, SR-IOV (RDMA) networking
+  - each with 2 or a higher number of CPU cores, 100GB or larger disk capacity, SR-IOV (RDMA) networking
 - 0 or a larger number of GPU nodes. 
-  - with 1 or a larger number of GPUs, 100GB or larger disk capacity, SR-IOV (RDMA) networking
+  - each with 1 or a larger number of GPUs, 100GB or larger disk capacity, SR-IOV (RDMA) networking
 
-We assume that all the above nodes are SSH-accessible from the basion host by using public key authentication without interaction like entering passwords (initial passwords must be set on each node beforehand after installation).
+We assume that all the above nodes are SSH-accessible from the basion host by using public key authentication without entering passwords (Initial passwords must be set on each node beforehand after OS installation).
+
+For example, use the ``-A`` (ForwardAgent) option to allow recursive SSH access to other nodes using the same public/private key pairs.
+```sh
+% eval `ssh-agent`
+% ssh-add
+% ssh -A (bastion's IP address)
+```
 
 ## Getting Started
 
@@ -67,6 +76,53 @@ $ play.sh
 
 The examples directory stores some example manifest files.
 
+## How to use this platform
+
+### Using kubectl and helm
+The kubectl and helm commands are installed on the bastion host.
+
+```sh
+mdxuser@bastion:~$ kubectl get node
+NAME         STATUS   ROLES    AGE    VERSION
+kube-gpu1    Ready    <none>   6d9h   v1.23.3+k0s
+kube-gpu2    Ready    <none>   6d9h   v1.23.3+k0s
+kube-node1   Ready    <none>   6d9h   v1.23.3+k0s
+kube-node2   Ready    <none>   6d9h   v1.23.3+k0s
+```
+
+### Accessing Kubernetes cluster from LENS
+LENS should be installed on an operator side machine that accesses the bastion host via SSH. 
+
+Copy and paste the ``.kube/config`` file to the LENS configuration and rewrite the kube-master's address to  ``localhost`` or ``127.0.0.1``.
+
+```yaml
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: ...
+    server: https://kube-master:6443
+  name: k0s-cluster
+```
+
+When accessing, use SSH port forwarding to make kube-master accessible from LENS.
+
+```sh
+% ssh -L 6443:(kube-master's IP address):6443 -A (bastion's IP address)
+```
+
+### Accessing Harbor 
+Harbor accepts connections on 443 port of the Harbor host. Use SSH port forwarding to make it accessible from the local web browser.
+```ssh
+% ssh -L 8443:(harbor's IP address):443 -A (bastion's IP address)
+```
+Harbor's admin password was set during installation.
+
+### Accessing Grafana
+To access Grafana dashboard, use the ``kubectl port-forward`` and SSH port forwarding. The Grafana's password was set in ``vault.yaml`` during installation process.
+
+To make the access more persistent, use the LoadBalancer service instead of default one (Please see ``examples/grafana`` directory).
+
 ## Known issues and limitations
 
 - Apache Spark jobs don't work properly at this time.
+- In the current mdx, virtual machines must be set up manually.
