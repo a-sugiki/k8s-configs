@@ -143,12 +143,12 @@ NAME                 PROVISIONER       RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOW
 exascaler-sc-fast    exa.csi.ddn.com   Delete          Immediate           false                  5d18h
 exascaler-sc-large   exa.csi.ddn.com   Delete          Immediate           false                  5d18h
 ```
-### Using GPUs and RDMA devices
+### Utilizing GPUs and RDMA devices
 
 GPUs and RDMA devices are defined as allocatable resourcees on nodes.
 
 ```sh
-$ kubectl describe node kube-gpu1
+bastion:~$ kubectl describe node kube-gpu1
 ...
 Addresses:
   Hostname:    kube-gpu1
@@ -159,7 +159,11 @@ Allocatable:
   nvidia.com/gpu:           1
   rdma/rdma_shared_device:  1k
 ```  
+### Running parallel jobs
+Please refer the [MPI operator's document](https://github.com/kubeflow/mpi-operator).
 
+### Running Spark applications
+Please refer [Spark RAPIDS document](https://nvidia.github.io/spark-rapids/docs/get-started/getting-started-kubernetes.html).
 
 ## Known issues and limitations
 
