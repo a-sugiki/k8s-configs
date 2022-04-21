@@ -147,9 +147,9 @@ Harbor accepts connections on 443 port of the Harbor host. Use SSH port forwardi
 ```
 Harbor's admin password was set during installation.
 
-### Pusing container images to Harbor
+### Pushing container images to Harbor
 
-Before pusing a container image to the Harbor, the user must login to the Harbor registory.
+Before pushing a container image to the Harbor, the user must login to the Harbor registory.
 
 ```sh
 bastion:~$ sudo docker login harbor.internal
