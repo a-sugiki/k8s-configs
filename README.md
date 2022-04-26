@@ -270,4 +270,4 @@ kubelet_extra_args: >-
 - Support for JupyterHub/BinderHub Operators
 - Support for [MySQL Operator](https://github.com/mysql/mysql-operator)
 - Support for other k8s distributions (such as [k3s](https://k3s.io/), [MicroK8s](https://microk8s.io/))
-- Data tranfer and processing between S3-compatible object storage
+- Data tranfer and processing from/to S3-compatible object storage
