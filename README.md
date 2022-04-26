@@ -269,4 +269,5 @@ kubelet_extra_args: >-
 - Support for [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
 - Support for JupyterHub/BinderHub Operators
 - Support for [MySQL Operator](https://github.com/mysql/mysql-operator)
+- Support for other k8s distributions (such as k3s, MicroK8s)
 - Data tranfer and processing between S3-compatible object storage
