@@ -228,7 +228,7 @@ and add an annotation to the pod definition:
     annotations:
       "k8s.v1.cni.cncf.io/networks": "rdma-ipvlan-conf"
 ```
-### Using LoadBalancer for services
+### Using LoadBalancer
 
 MetalLB automatically assigns public IP addresses (which are opened to the outside of the cluster) to Services from the pooled address range. It can be used by specifiyng the ``LoadBalancer`` type in a Kubernetes service definition.
 
