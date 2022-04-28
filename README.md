@@ -27,7 +27,7 @@ This playbook assumes the following virtual machines exist in a user tenant. All
   - with 2 or a higher number of CPU cores, 160GB or larger disk capacity, PortGroup networking
 - a single kubernetes master node 
   - with 2 or a higher number of CPU cores, PortGroup networking
-- 0 or a larger number of kubernetes' computing nodes. 
+- 0 or a larger number of kubernetes computing nodes. 
   - each with 2 or a higher number of CPU cores, 100GB or larger disk capacity, SR-IOV (RDMA) networking
 - 0 or a larger number of GPU nodes. 
   - each with 1 or a larger number of GPUs, 100GB or larger disk capacity, SR-IOV (RDMA) networking
