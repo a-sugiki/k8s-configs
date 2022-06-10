@@ -27,7 +27,7 @@ This playbook assumes the following virtual machines exist in a user tenant. All
   - with 2 or a higher number of CPU cores, 160GB or larger disk capacity, PortGroup networking
 - a single kubernetes master node 
   - with 2 or a higher number of CPU cores, PortGroup networking
-- 0 or a larger number of kubernetes' computing nodes. 
+- 0 or a larger number of kubernetes computing nodes. 
   - each with 2 or a higher number of CPU cores, 100GB or larger disk capacity, SR-IOV (RDMA) networking
 - 0 or a larger number of GPU nodes. 
   - each with 1 or a larger number of GPUs, 100GB or larger disk capacity, SR-IOV (RDMA) networking
@@ -147,9 +147,9 @@ Harbor accepts connections on 443 port of the Harbor host. Use SSH port forwardi
 ```
 Harbor's admin password was set during installation.
 
-### Pusing container images to Harbor
+### Pushing container images to Harbor
 
-Before pusing a container image to the Harbor, the user must login to the Harbor registory.
+Before pushing a container image to the Harbor, the user must login to the Harbor registory.
 
 ```sh
 bastion:~$ sudo docker login harbor.internal
@@ -228,7 +228,7 @@ and add an annotation to the pod definition:
     annotations:
       "k8s.v1.cni.cncf.io/networks": "rdma-ipvlan-conf"
 ```
-### Using LoadBalancer for services
+### Using LoadBalancer
 
 MetalLB automatically assigns public IP addresses (which are opened to the outside of the cluster) to Services from the pooled address range. It can be used by specifiyng the ``LoadBalancer`` type in a Kubernetes service definition.
 
@@ -269,4 +269,6 @@ kubelet_extra_args: >-
 - Support for [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
 - Support for JupyterHub/BinderHub Operators
 - Support for [MySQL Operator](https://github.com/mysql/mysql-operator)
-- Data tranfer and processing between S3-compatible object storage
+- Support for other k8s distributions (such as [k3s](https://k3s.io/), [MicroK8s](https://microk8s.io/))
+- Building a cluster of k8s clusters, like [Fleet](https://github.com/rancher/fleet)
+- Data tranfer and processing from/to S3-compatible object storage
