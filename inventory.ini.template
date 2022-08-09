@@ -24,11 +24,11 @@ kube_master
 kube_worker
 
 [kube_master:vars]
-roce_netif = ens160
+roce_netif = ens160np0
 
 [kube_node:vars]
-roce_netif = ens160
+roce_netif = ens160np0
 
 [kube_gpu:vars]
-roce_netif = ens192
+roce_netif = ens192np0
 
