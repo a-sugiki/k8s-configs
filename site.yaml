@@ -96,14 +96,14 @@
   - all
   - never
 
-- name: Deploy spark operator
-  hosts: bastion_host
-  vars_files:
-    - vault.yaml
-  roles:
-    - spark
-  tags:
-  - spark
-  - k8s
-  - all
-  - never
+#- name: Deploy spark operator
+#  hosts: bastion_host
+#  vars_files:
+#    - vault.yaml
+#  roles:
+#    - spark
+#  tags:
+#  - spark
+#  - k8s
+#  - all
+#  - never

@@ -17,7 +17,7 @@
       nfd:
         enabled: true
       mig:
-        strategy: single
+        strategy: mixed
       driver:
         enabled: false
         rdma:

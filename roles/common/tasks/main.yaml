@@ -11,6 +11,12 @@
     backup: yes
   become: yes
 
+- name: Remove unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: absent
+  become: yes
+
 - name: Update apt cache
   apt:
     update_cache: yes

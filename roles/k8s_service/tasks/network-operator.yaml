@@ -16,16 +16,13 @@
     values:
       nfd:
         enabled: false
-        #enabled: true
       sriovNetworkOperator:
         enabled: false
       deployCR: true
       ofedDriver:
         deploy: false
-        #deploy: true
       nvPeerDriver:
         deploy: false
-        #deploy: true
       rdmaSharedDevicePlugin:
         deploy: true
         resources:

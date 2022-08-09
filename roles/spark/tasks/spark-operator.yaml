@@ -19,11 +19,11 @@
     chart_ref: spark-operator/spark-operator
     release_namespace: spark-operator
     create_namespace: true
-#    values:
+    values:
 #      sparkJobNamespace:
 #        '{{ spark_jobs_namespace }}'
-#      serviceAccounts.spark.name:
-#        spark
+      serviceAccounts.spark.name:
+        spark
 
 - name: Git clone spark k8s operator
   git:

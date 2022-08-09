@@ -13,11 +13,34 @@
     chart_ref: metallb/metallb
     release_namespace: metallb
     create_namespace: true
-    values:
-      configInline:
-        address-pools:
-          - name: default
-            protocol: layer2
-            addresses:
-            - '{{ metallb_addresses }}'
 
+#- name: Generate l2.yaml
+#  template:
+#    src: templates/l2.yaml.j2
+#    dest: /tmp/l2.yaml
+
+- name: Create an IP address pool
+  k8s:
+    state: present
+    definition:
+      apiVersion: metallb.io/v1beta1
+      kind: IPAddressPool
+      metadata:
+        name: address-pool
+        namespace: metallb
+      spec:
+        addresses:
+        - '{{ metallb_addresses }}'
+
+- name: Create a L2 advertisement
+  k8s:
+    state: present
+    definition:
+      apiVersion: metallb.io/v1beta1
+      kind: L2Advertisement
+      metadata:
+        name: l2-advertise
+        namespace: metallb
+      spec:
+        ipAddressPools:
+        - address-pool

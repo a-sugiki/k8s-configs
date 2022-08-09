@@ -27,7 +27,7 @@
 
 - name: Building GDRCopy
   shell:
-    cmd: CUDA=/usr ./build-deb-packages.sh
+    cmd: CUDA=/usr/local/cuda-11.6 ./build-deb-packages.sh
     chdir: /tmp/gdrcopy-{{ gdr_version }}/packages
 
 - name: Install GDRCopy

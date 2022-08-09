@@ -52,11 +52,11 @@
     url: https://nvidia.github.io/spark-rapids/docs/get-started/Dockerfile.cuda
     dest: '{{ spark_image_dir }}'
 
-- name: Comment out the FROM line in the docker file 
-  replace:
-    dest: '{{ spark_image_dir }}/Dockerfile.cuda'
-    regexp: '^(FROM.*)$'
-    replace: '#\1'
+#- name: Comment out the FROM line in the docker file 
+#  replace:
+#    dest: '{{ spark_image_dir }}/Dockerfile.cuda'
+#    regexp: '^(FROM.*)$'
+#    replace: '#\1'
 
 - name: Rewrite CUDA_VER
   replace:
@@ -76,14 +76,18 @@
 #    regexp: 'ARG UCX_CUDA_VER=11.2'
 #    replace: 'ARG UCX_CUDA_VER=11'
 
-- name: Create a Dockerfile
-  shell:
-    cmd: cat Dockerfile.ubuntu_rdma > Dockerfile
-    chdir: '{{ spark_image_dir }}'
+#- name: Create a Dockerfile
+#  shell:
+#    cmd: cat Dockerfile.ubuntu_rdma > Dockerfile
+#    chdir: '{{ spark_image_dir }}'
 
+#- name: Append content to the Dockerfile
+#  shell:
+#    cmd: cat Dockerfile.cuda >> Dockerfile
+#    chdir: '{{ spark_image_dir }}'
 - name: Append content to the Dockerfile
   shell:
-    cmd: cat Dockerfile.cuda >> Dockerfile
+    cmd: cat Dockerfile.cuda > Dockerfile
     chdir: '{{ spark_image_dir }}'
 
 - name: Build a docker image
